@@ -16,7 +16,7 @@ function displayPage(divID) {
 
     if (divID === "page_map")
         updateProductDetailInMap("")
-        
+
 
 }
 
@@ -33,9 +33,9 @@ function formattedDate(d = new Date) {
     if (day.length < 2) day = '0' + day;
 
     var hour = d.getHours();
-    var mins = d.getMinutes() ;
+    var mins = d.getMinutes();
 
-    if(mins<10) mins = '0' + mins;
+    if (mins < 10) mins = '0' + mins;
 
     return `${day}/${month}/${year} ${d.getHours()}:${mins}`;
 }
@@ -284,15 +284,24 @@ var createMap = (mapPosition) => {
 
 var updateProductCounts = (productName) => {
 
-    document.querySelector("#num_loc").innerHTML = "";
-    if (productName === "")
-        return ;
+
+    if (productName === "") {
+        document.querySelector("#num_loc").innerHTML = "";
+        return;
+    }
+
+    var myProductName = getCurrentProductName()
+    if (myProductName === productName) {
 
         var totalProducts = getUIMarkersArray(productName).length;
-    console.log("totalProducts == " + totalProducts);
-    if (totalProducts > 0)
-        document.querySelector("#num_loc").innerHTML = totalProducts + " locations";
-  
+        console.log("totalProducts == " + totalProducts);
+        if (totalProducts > 0)
+            document.querySelector("#num_loc").innerHTML = totalProducts + " locations";
+        else
+            document.querySelector("#num_loc").innerHTML = "";
+
+    }
+
 }
 
 var updateProductDetailInMap = (productName) => {
