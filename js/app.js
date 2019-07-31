@@ -468,9 +468,36 @@ var initMarkerChannel = (channelName) => {
     });
 }
 
+var initServiceWorkerForClient =() => {
+    if (!('serviceWorker' in navigator)) {
+        console.log('Service Worker not supported');
+        return;
+    }
+
+    navigator.serviceWorker.register('service-worker.js')
+        .then(() => {
+            console.log('Registered Service Worker');
+            //subscribePushNotification(); //taken away in ex. 3 to subscribe on click of button
+
+            subscribePushNotification();
+
+        })
+        .catch(error => {
+            console.log("Registering of Service Worker Failed: " + error);
+        });
+
+    //START - Ex 4 add handler to receive message from Service Worker
+    navigator.serviceWorker.addEventListener("message", function (event) {
+        console.log("[Client] Received From Service Worker: " + event.data);
+            alert(event.data);
+    });
+
+}
+
 var indexPage = () => {
 
-
+    initServiceWorkerForClient() ;
+ 
     AjaxInit();
 
     initMarkerChannel('Add-Marker');
@@ -489,5 +516,32 @@ var indexPage = () => {
     displayPage("page_home");
 
 }
+
+function subscribePushNotification() {
+    console.log("subscribePushNotification") ;
+    navigator.serviceWorker.ready.then(function (registration) {
+        //Check if Push Notification function exists in browser
+        if (!registration.pushManager) {
+            alert("Push Notification not supported in browser!");
+            return;
+        }
+
+        registration.pushManager.subscribe(
+            { userVisibleOnly: true } //always show notification when received from server
+        )
+            .then(function (subscription) {
+                console.log(subscription);
+                saveSubscriptionID(subscription);
+            }
+            )
+            .catch(function (error) {
+                console.log(error);
+            }
+            );
+    });
+}
+
+
+
 
 
