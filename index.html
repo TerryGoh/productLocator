@@ -1,0 +1,54 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <link rel="manifest" href="manifest.json">
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="./service-worker.js"></script>
+    <script src="  https://maps.googleapis.com/maps/api/js?key=AIzaSyD-zNHnUc5GoPIHriflvM8mNxImltDtVsU "></script>
+    <script>
+
+        $(() => {
+            indexPage();
+        })
+    </script>
+    <link href="index.css" rel="stylesheet" type="text/css">
+
+</head>
+
+
+<body>
+    <div id="page_home" class="page">
+        <div class="div_header">
+            <span id="span_header">Listing</span>
+            <span id="span_header_date"></span>
+        </div>
+        <div id="div_products_list">
+            <ul id="ul_products_list"></ul>
+        </div>
+    </div>
+    <div id="page_details" class="page">
+        <div class="div_header">
+            <span id="span_header"><img id="btn_product_details_back" src="img/back_white.png">
+                <span id="product_name"></span>
+            </span></span>
+        </div>
+        <div id="div_product_details"></div>
+        <div id="div_product_details_footer">TO THE MAP ></div>
+    </div>
+    <div id="page_map" class="page">
+        <div id="div_header_product_map" class="div_header">
+            <div class="cf" id="span_header">
+                <img id="btn_product_map_back" src="img/back_white.png">Product Detail
+
+                <img id="prod_img" src="" /></img>
+            </div>
+            <span id="num_loc"></span>
+  
+        </div>
+        <div id="div_product_map"></div>
+    </div>
+</body>
+
+</html>
