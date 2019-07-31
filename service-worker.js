@@ -1,68 +1,3 @@
-const cacheName = 'v1';
-
-var cacheAssets =
-    ["index.html",
-        "js/app.js",
-        "index.css",
-        "manifest.json",
-        "img/back_white.png",
-        "images/icons/icon-72x72.png",
-        "images/icons/icon-96x96.png",
-        "images/icons/icon-128x128.png",
-        "images/icons/icon-144x144.png",
-        "images/icons/icon-152x152.png",
-        "images/icons/icon-192x192.png",
-        "images/icons/icon-384x384.png",
-        "images/icons/icon-512x512.png"
-    ];
-
-
-if ('serviceWorker' in navigator) {
-
-    window.addEventListener('load', () => {
-        navigator.serviceWorker
-            .register("service-worker.js")
-            .then(reg => {
-                console.log("Service Worker : Registered")
-
-                if (Notification.permission === 'denied') {
-                    alert('User has blocked push notification.');
-                    return;
-                }
-
-                //Check `push notification` is supported or not
-                if (!('PushManager' in window)) {
-                    alert('Sorry, Push notification isn\'t supported in your browser.');
-                    return;
-                }
-                subscribePushNotification();
-            })
-            .catch(err => console.log(`Service Worker : Error : ${err}`));
-    });
-
-    window.addEventListener('message', e => {
-        console.log("[Client] Received notification from Service Worker: " + e.data)
-
-        if (e.data == "notification") {
-            alert("Notification Recieved!!")
-        }
-    });
-}
-
-function subscribePushNotification() {
-
-    navigator.serviceWorker.ready.then(registration => {
-        registration.pushManager.subscribe(
-            { userVisibleOnly: true })
-            .then(subscription => {
-                console.log(subscription.endpoint);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    });
-}
-
 // Install Service Worker
 self.addEventListener("install", e => {
     console.log('Service Worker: Installed')
@@ -78,80 +13,69 @@ self.addEventListener("install", e => {
 });
 
 
-// Activate Service Worker
-self.addEventListener("activate", function (e) {
-    console.log("Service worker Activated");
-    // remove unwanted caches
-    e.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cache => {
-                    if (cache !== cacheName) {
-                        console.log('Service Worker: Clearing Old Cache');
-                        return caches.delete(cache);
-                    }
-                })
-            )
-        })
-    )
+self.addEventListener("activate", function(event){
+	console.log("Service Worker activating.");
 });
 
-// Call Fetch Event
 self.addEventListener('fetch', e => {
     console.log('Service Worker: Fetching');
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 })
 
+self.addEventListener('push', function(event) {
+	console.log('[Service Worker] Push Received.');
+	console.log(event);
+	var notificationText = "You Got New Message!";
+	if(event.data){
+	 notificationText = event.data.text();
+	}
 
-self.addEventListener("push", (e) => {
+	const title = 'Product Locator Push Message';
+	const options = {
+		body: notificationText,
+		icon: './images/icons/icon-128x128.png',
+		badge: './images/icons/icon-128x128.png'
+	};
 
-    console.log("[Service Worker] : Push Notification received");
-
-    var notificationText = "You Got New Message!";
-    if (e.data) {
-        notificationText = e.data.text();
-    }
-
-    const title = 'Terry WMP Assignment 2';
-    const options = {
-        body: notificationText,
-        icon: './images/icons/icon-128x128.png',
-        badge: './images/icons/icon-128x128.png'
-    };
-  //  send_message_to_all_clients("notification");
-    e.waitUntil(self.registration.showNotification(title, options));
+	send_message_to_all_clients(event.data.text());
+	event.waitUntil(self.registration.showNotification(title, options));
 });
-/*
-self.addEventListener("notificationclick", e => {
-    console.log('[Service Worker]: Notification Clicked');
-    e.notification.close();
-    e.waitUntil(clients.openWindow("localhost:8887"));
+
+self.addEventListener('notificationclick', function(event) { //What happens when clicked on Notification
+	console.log('[Service Worker] Notification click Received.');
+
+	event.notification.close();
 });
-*/
 
-function send_message_to_client(client, msg) {
-    return new Promise(function (resolve, reject) {
-        var msg_chan = new MessageChannel();
-        msg_chan.port1.onmessage = function (event) {
-            if (event.data.error) {
-                reject(event.data.error);
-            } else {
-                resolve(event.data);
-            }
-        };
-        client.postMessage(msg, [msg_chan.port2]);
+//START - Ex 4 add handler to receive message from Client
+self.addEventListener("message", function(event){
+	console.log("[Service Worker] Received From Client: " + event.data);
+});
 
-    });
+function send_message_to_client(client,msg){
+	return new Promise(function(resolve,reject){ //Returns a Promise to extend a THEN later when sending to multiple clients
+		var msg_chan = new MessageChannel(); //API to send message between Client & SW
+		msg_chan.port1.onmessage = function(event){ //Send a Promise Resolve only when the reply message is received from Client
+			if (event.data.error){
+				reject(event.data.error);
+			} else {
+				resolve(event.data);
+			}
+		};
+		
+		client.postMessage(msg, [msg_chan.port2]);
+	});
 }
-/*
-function send_message_to_all_clients(msg) {
-    clients.matchAll().then(clients => {
-        console.log("Entere here !!")
-        clients.forEach(client => {
-            console.log("Send message to client!!")
-            send_message_to_client(client, msg).then(m => {
-                console.log('[Service Worker] From Client : ' + msg);
-            });
-        })
-    })
-}*/
+
+function send_message_to_all_clients(msg){ //Multiple Clients might be opened, so SW need to send the message to ALL clients
+	clients.matchAll()
+	.then(clients =>{
+		clients.forEach(client => { //Send a message to all clients SW servicing
+			send_message_to_client(client,msg)
+			.then(m => //Response/Confirmation message from Client that it has been received
+				console.log("[Service Worker] From Client:" + msg)
+			);
+		});
+	});
+}
+//END
