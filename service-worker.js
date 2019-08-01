@@ -27,7 +27,6 @@ self.addEventListener("install", e => {
 				console.log('Service Worker: Caching Files')
 				cache.addAll(cacheAssets);
 				// speed up the cacheing...
-				location.reload() ;
 
 			})
 			.then(() => self.skipWaiting())
