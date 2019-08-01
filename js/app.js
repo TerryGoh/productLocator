@@ -194,7 +194,7 @@ function delMarkerCB(event) {
     var productName = getCurrentProductName();
     if (!delMarkerInLocalStore(productName, currPostion(event.latLng)))
         return;
-    send_message_to_all_clients({ name: productName, location: currPostion(event.latLng) }, 'Del-Marker');
+        broadcastMarkerOperation({ name: productName, location: currPostion(event.latLng) }, 'Del-Marker');
 }
 
 function addMarkerInLocalStore(productName, currentPos) {
@@ -239,10 +239,10 @@ function addMarkerCB(event) {
 
     var myPos = currPostion(event.latLng);
     addMarkerInLocalStore(productName, myPos);
-    send_message_to_all_clients({ name: productName, location: myPos }, 'Add-Marker');
+    broadcastMarkerOperation({ name: productName, location: myPos }, 'Add-Marker');
 }
 
-function send_message_to_all_clients(msg, channelName) {
+function broadcastMarkerOperation(msg, channelName) {
     const channel = new BroadcastChannel(channelName);
     console.log(msg);
     channel.postMessage(msg);
@@ -486,11 +486,12 @@ var initServiceWorkerForClient =() => {
             console.log("Registering of Service Worker Failed: " + error);
         });
 
-    //START - Ex 4 add handler to receive message from Service Worker
-    navigator.serviceWorker.addEventListener("message", function (event) {
+   /*
+        navigator.serviceWorker.addEventListener("message", function (event) {
         console.log("[Client] Received From Service Worker: " + event.data);
         //alert(event.data);
     });
+    */
 
 }
 
