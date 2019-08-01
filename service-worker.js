@@ -75,10 +75,6 @@ self.addEventListener('notificationclick', function(event) { //What happens when
 	
 });
 
-self.addEventListener("message", function(event){
-	console.log("[Service Worker] Received From Client: " + event.data);
-});
-
 function send_message_to_client(client,msg){
 	return new Promise(function(resolve,reject){ //Returns a Promise to extend a THEN later when sending to multiple clients
 		var msg_chan = new MessageChannel(); //API to send message between Client & SW
