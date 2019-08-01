@@ -489,7 +489,7 @@ var initServiceWorkerForClient =() => {
     //START - Ex 4 add handler to receive message from Service Worker
     navigator.serviceWorker.addEventListener("message", function (event) {
         console.log("[Client] Received From Service Worker: " + event.data);
-            alert(event.data);
+        //alert(event.data);
     });
 
 }
