@@ -95,7 +95,7 @@ function send_message_to_client(client,msg){
 }
 
 function send_message_to_all_clients(msg){ //Multiple Clients might be opened, so SW need to send the message to ALL clients
-	if (typeof clients === 'undefined'))
+	if (typeof clients === 'undefined')
 		return ;
 	clients.matchAll()
 	.then(clients =>{
