@@ -95,7 +95,7 @@ function send_message_to_all_clients(msg){ //Multiple Clients might be opened, s
 	clients.matchAll()
 	.then(clients =>{
 		clients.forEach(client => { //Send a message to all clients SW servicing
-			send_message_to_client_1(client,msg)
+			send_message_to_client(client,msg)
 			.then(m => //Response/Confirmation message from Client that it has been received
 				console.log("[Service Worker] From Client:" + msg)
 			);
